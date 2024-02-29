@@ -50,7 +50,8 @@
                         break;
                     }
                 }
-                throw "user used invalid name"
+                if (failed)                
+                    throw "user used invalid name";
                 document.body.innerText = "";
                 var mmr = ""; //we dont have to store it as a number because its a string on the website lmao
                 var tags = ""; //same with tags
