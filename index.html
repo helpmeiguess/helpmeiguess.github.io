@@ -9,6 +9,7 @@
             //this is a really inefficient way to find the mmr and tags btw lmao
 
             //sorry
+
             alert("If this is your first time using this, please watch the tutorial in the thread.");
             const username = prompt("What is the last name you used in a ranked lobby?");
             const discordid = prompt("What is your Discord ID?");
@@ -21,24 +22,35 @@
 
                 document.body.innerText = "finding user...";
                 while (true) {
-                    await fetch("https://gorillatagcomp.com/leaderboard/"+page.toString()+"/"+username).then((response) => response.text()).then((text) => {
-                        index = text.indexOf(discordid,1);
-                        if (index == -1) { //checks if your account is on the page. usually finds the id in the avatar image link.
-                            if (text.search("MainCardContainer") == -1) { // really stupid way to check if no players are found.
-                                dobreak = true;
-                                failed = true;
+                    try {
+                        await fetch("https://gorillatagcomp.com/leaderboard/"+page.toString()+"/"+username).then((response) => response.text()).then((text) => {
+                            index = text.indexOf(discordid,1);
+                            if (index == -1) { //checks if your account is on the page. usually finds the id in the avatar image link.
+                                if (text.search("MainCardContainer") == -1) { // really stupid way to check if no players are found.
+                                    dobreak = true;
+                                    failed = true;
+                                }
                             }
+                            else
+                            {
+                                dobreak = true;
+                                body = text;
+                            }
+                        })
+                        if (failed) {
+                            throw "invalid name or user";
                         }
-                        else
-                        {
-                            dobreak = true;
-                            body = text;
-                        }
-                    })
-                    if (dobreak)
+                        if (dobreak)
+                            break;
+                        page += 1;
+                    }
+                    catch {
+                        alert("Your ID or Username may be wrong.\n If not, please install this extension, then come back. You will be redirected when you press OK.");
+                        window.location.replace("https://chromewebstore.google.com/detail/cross-domain-cors/mjhpgnbimicffchbodmgfnemoghjakai");
                         break;
-                    page += 1;
+                    }
                 }
+                throw "user used invalid name"
                 document.body.innerText = "";
                 var mmr = ""; //we dont have to store it as a number because its a string on the website lmao
                 var tags = ""; //same with tags
@@ -78,7 +90,7 @@
                 document.body.appendChild(newDiv);
             }
             mainthing();
-    
+
     
         </script>
     </body>
