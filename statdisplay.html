@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+    <head><title>Stat Viewer</title></head>
+    <body style="background-color: rgb(30, 30, 40);">
+        <script>
+            //please forgive me i barely know js
+            //like barely barely i basically taught myself for this specifically
+            //js sucks so bad btw wtf
+            //this is a really inefficient way to find the mmr and tags btw lmao
+
+            //sorry
+            alert("If this is your first time using this, please watch the tutorial in the thread.");
+            const username = prompt("What is the last name you used in a ranked lobby?");
+            const discordid = prompt("What is your Discord ID?");
+            var page = 0;
+            var body = "";
+            var dobreak = false;
+            var failed = false;
+            var index = -1;
+            async function mainthing() {
+
+                document.body.innerText = "finding user...";
+                while (true) {
+                    await fetch("https://gorillatagcomp.com/leaderboard/"+page.toString()+"/"+username).then((response) => response.text()).then((text) => {
+                        index = text.indexOf(discordid,1);
+                        if (index == -1) { //checks if your account is on the page. usually finds the id in the avatar image link.
+                            if (text.search("MainCardContainer") == -1) { // really stupid way to check if no players are found.
+                                dobreak = true;
+                                failed = true;
+                            }
+                        }
+                        else
+                        {
+                            dobreak = true;
+                            body = text;
+                        }
+                    })
+                    if (dobreak)
+                        break;
+                    page += 1;
+                }
+                document.body.innerText = "";
+                var mmr = ""; //we dont have to store it as a number because its a string on the website lmao
+                var tags = ""; //same with tags
+                var link = "https://gorillatagcomp.com/leaderboard/"+page.toString()+"/"+username;
+                var tmpbody = body.substring(index+discordid.length+500,index+discordid.length+1500); //i know, i know, dont repeat yourself, but i have no idea how to put this all in a function conveniently.
+                mmr = tmpbody.substring(tmpbody.search(/(?<=children\\":\[\\")(.*)(?=\,\\"mmr)/),tmpbody.indexOf("\\\",\\\"mmr"));
+                var tmpind = tmpbody.search(/(?<=NumberOfNameLeader\\",\\"children\\":)(.*)(?=}\]\]})/);
+                tmpbody = tmpbody.substring(tmpind,tmpbody.length-1);
+                tags = tmpbody.substring(0,tmpbody.search(/}\]\]}/));
+                const newDiv = document.createElement("div");
+                var mmrdisplay = document.createElement("p");
+                mmrdisplay.textContent = "MMR: "+ mmr;
+                mmrdisplay.style.fontSize = "200px";
+                mmrdisplay.style.fontFamily = "Arial";
+                mmrdisplay.style.textAlign = "center";
+                mmrdisplay.style.color = "white";
+                var tagsdisplay = document.createElement("p");
+                tagsdisplay.textContent = "Tags: "+ tags;
+                tagsdisplay.style.fontSize = "140px";
+                tagsdisplay.style.fontFamily = "Arial";
+                tagsdisplay.style.color = "white";
+                tagsdisplay.style.textAlign = "center"
+                newDiv.appendChild(mmrdisplay);
+                newDiv.appendChild(tagsdisplay);
+                document.body.style.zoom = (window.innerWidth / window.outerWidth)
+                window.setInterval(async function(){
+                    await fetch(link).then((response) => response.text()).then((text) => {body = text});
+                    tmpbody = body.substring(index+discordid.length+500,index+discordid.length+1500); //i know, i know, dont repeat yourself, but i have no idea how to put this all in a function conveniently.
+                    mmrdisplay.textContent = "MMR: " + tmpbody.substring(tmpbody.search(/(?<=children\\":\[\\")(.*)(?=\,\\"mmr)/),tmpbody.indexOf("\\\",\\\"mmr"));
+                    tmpind = tmpbody.search(/(?<=NumberOfNameLeader\\",\\"children\\":)(.*)(?=}\]\]})/);
+                    tmpbody = tmpbody.substring(tmpind,tmpbody.length-1);
+                    tagsdisplay.textContent = "Tags: " + tmpbody.substring(0,tmpbody.search(/}\]\]}/));
+                    console.log("updated");
+                },7000)
+
+
+                document.body.appendChild(newDiv);
+            }
+            mainthing();
+    
+    
+        </script>
+    </body>
+
+</html>
