@@ -45,13 +45,22 @@
                         page += 1;
                     }
                     catch {
-                        alert("Your ID or Username may be wrong.\n If not, please install this extension, then come back. You will be redirected when you press OK.");
-                        window.location.replace("https://chromewebstore.google.com/detail/cross-domain-cors/mjhpgnbimicffchbodmgfnemoghjakai");
+                        if (!failed) {
+                            alert("CORS error: Unable to reach gorillatagcomp.com\nPlease install this extension, then come back and try again. The page will open when you press OK.");
+                            window.open("https://chromewebstore.google.com/detail/cross-domain-cors/mjhpgnbimicffchbodmgfnemoghjakai");
+                            window.location.reload();
+                        }
+                        else {
+                            alert("Could not find user. Your ID or Username may be wrong. Make sure you \nPlease try again. This page will refresh when you press OK.")
+                            window.location.reload();
+                        }
+
                         break;
                     }
                 }
                 if (failed)                
                     throw "user used invalid name";
+                
                 document.body.innerText = "";
                 var mmr = ""; //we dont have to store it as a number because its a string on the website lmao
                 var tags = ""; //same with tags
@@ -79,7 +88,7 @@
                 document.body.style.zoom = (window.innerWidth / window.outerWidth)
                 window.setInterval(async function(){
                     await fetch(link).then((response) => response.text()).then((text) => {body = text});
-                    tmpbody = body.substring(index+discordid.length+500,index+discordid.length+1500); //i know, i know, dont repeat yourself, but i have no idea how to put this all in a function conveniently.
+                    tmpbody = body.substring(index+discordid.length+500,index+discordid.length+1500);
                     mmrdisplay.textContent = "MMR: " + tmpbody.substring(tmpbody.search(/(?<=children\\":\[\\")(.*)(?=\,\\"mmr)/),tmpbody.indexOf("\\\",\\\"mmr"));
                     tmpind = tmpbody.search(/(?<=NumberOfNameLeader\\",\\"children\\":)(.*)(?=}\]\]})/);
                     tmpbody = tmpbody.substring(tmpind,tmpbody.length-1);
